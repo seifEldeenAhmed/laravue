@@ -1,7 +1,7 @@
 <template>
   <DashboardLayout title="Admin Dashboard">
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <StatsCard title="Total Posts" :value="totalPosts" icon="document" color="orange" />
       <StatsCard title="Published Posts" :value="publishedPosts" icon="check" color="green" />
       <StatsCard title="Draft Posts" :value="draftPosts" icon="clock" color="yellow" />

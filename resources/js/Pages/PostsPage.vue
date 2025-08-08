@@ -13,7 +13,7 @@
             <!-- Posts List -->
             <PostsList :posts="postsStore.posts" :loading="postsStore.loading"
                 :user-role="authStore.isAdmin ? 'admin' : 'user'" @create="openCreateModal" @edit="openEditModal"
-                @delete="deletePost" @search="handleSearch" />
+                @delete="showConfirm" @search="handleSearch" />
 
             <!-- Error Message -->
             <div v-if="postsStore.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -23,6 +23,9 @@
                 </button>
             </div>
 
+            <Toast :show="showToast" :type="toastType" :message="toastMessage" @close="handleToastClose" />
+            <!-- Confirm delete modal -->
+            <Confirm v-if="showConfirmModal" :show="showConfirmModal" @confirm="handleDelete" @close="closeConfirm" />
             <!-- Create/Edit Modal -->
             <PostModal v-if="showModal" :show="showModal" :post="selectedPost" @close="closeModal"
                 @submit="handlePostSaved" />
@@ -37,12 +40,19 @@ import PostsList from "../components/dashboard/PostsList.vue";
 import PostModal from "../components/dashboard/PostModal.vue";
 import { useAuthStore } from "../stores/auth";
 import { usePostsStore } from "../stores/posts";
+import Confirm from "../components/ui/Confirm.vue";
+import Toast from "../components/ui/Toast.vue";
 
 const authStore = useAuthStore();
 const postsStore = usePostsStore();
 const showModal = ref(false);
+const showConfirmModal = ref(false);
 const selectedPost = ref(null);
 const search = ref('');
+const showToast = ref(false);
+const toastType = ref('success');
+const toastMessage = ref('');
+
 const openCreateModal = () => {
     selectedPost.value = null;
     showModal.value = true;
@@ -58,6 +68,10 @@ const closeModal = () => {
     selectedPost.value = null;
     postsStore.clearError();
 };
+
+const handleToastClose = () => {
+    showToast.value = false
+}
 const handleSearch = (e) => {
     search.value = e.target.value;
     postsStore.fetchPosts(search.value);
@@ -67,26 +81,44 @@ const handlePostSaved = async (postData) => {
         if (selectedPost.value) {
             // Update existing post
             await postsStore.updatePost(selectedPost.value.id, postData);
+            toastMessage.value = 'Updated Successfully'
         } else {
             // Create new post
             await postsStore.createPost(postData);
+            toastMessage.value = 'Added Successfully'
         }
         closeModal();
     } catch (error) {
         // Error is handled in the store, modal can show the error
-        console.error("Error saving post:", error);
+        toastMessage.value = 'Error Saving Post';
+    } finally{
+        showToast.value = true; 
     }
 };
 
-const deletePost = async (post) => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-
+const handleDelete = async () => {
     try {
-        await postsStore.deletePost(post.id);
+        await postsStore.deletePost(selectedPost.value.id);
+        toastMessage.value = 'Deleted Successfully'
     } catch (error) {
-        alert("Error deleting post: " + (postsStore.error || "Unknown error"));
+        toastType.value = 'error'
+        toastMessage.value = 'Error Deleting Post'
+    } finally {
+        closeConfirm()
+        showToast.value = true;
+        selectedPost.value = null
     }
+
+}
+
+const showConfirm = (post) => {
+    showConfirmModal.value = true;
+    selectedPost.value = post
 };
+
+const closeConfirm = () => {
+    showConfirmModal.value = false
+}
 
 onMounted(() => {
     // Only fetch if we don't have posts or if we want to refresh

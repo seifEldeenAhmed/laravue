@@ -53,7 +53,10 @@
                 {{ formatDate(post.created_at) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <button @click="$emit('edit', post)" class="text-orange-600 hover:text-orange-900">Edit</button>
+                <button @click="$emit('edit', post)" class="text-orange-600 hover:text-orange-900">
+
+                  Edit
+                </button>
                 <button @click="$emit('delete', post)" class="text-red-600 hover:text-red-900">Delete</button>
               </td>
             </tr>
@@ -74,9 +77,17 @@
                 <span class="text-sm text-gray-500">{{ formatDate(post.created_at) }}</span>
               </div>
             </div>
-            <div class="ml-4 flex-shrink-0 space-x-2">
-              <button @click="$emit('edit', post)" class="text-orange-600 hover:text-orange-900 text-sm">Edit</button>
-              <button @click="$emit('delete', post)" class="text-red-600 hover:text-red-900 text-sm">Delete</button>
+            <div class="ml-4 inline-block h-4 space-x-2">
+              <button @click="$emit('edit', post)"
+                class="text-gray-600 hover:text-orange-800 text-sm flex flex-row justify m-3">
+                <PencilIcon class="me-2" />
+                Edit
+              </button>
+              <button @click="$emit('delete', post)"
+                class="text-red-600 hover:text-red-800 text-sm flex flex-row justify">
+                <TrashIcon class="me-2" />
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -86,6 +97,8 @@
 </template>
 
 <script setup>
+import TrashIcon from '../ui/TrashIcon.vue'
+import PencilIcon from '../ui/PencilIcon.vue'
 import StatusBadge from '../ui/StatusBadge.vue'
 
 defineProps({
