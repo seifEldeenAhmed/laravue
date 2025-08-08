@@ -38,6 +38,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
     Route::delete('/admins/{admin}', [\App\Http\Controllers\AdminController::class, 'destroy']);
 });
 
+//Dashboard route for admin
+Route::get('/admin/dashboard', \App\Http\Controllers\AdminDashboardController::class);
 Route::group(['prefix' => 'posts', 'middleware' => ['auth:sanctum']], function () {
     Route::get('/', [\App\Http\Controllers\PostController::class, 'index']);
     Route::post('/', [\App\Http\Controllers\PostController::class, 'store']);

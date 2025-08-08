@@ -11,12 +11,12 @@
           Create New Post
         </button>
       </div>
-      
+
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-4">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
-      
+
       <!-- Empty State -->
       <div v-else-if="posts.length === 0" class="text-center py-8 text-gray-500">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
         <h3 class="mt-2 text-sm font-medium text-gray-900">No posts</h3>
         <p class="mt-1 text-sm text-gray-500">Get started by creating a new post.</p>
       </div>
-      
+
       <!-- Table View (for admin) -->
       <div v-else-if="viewMode === 'table'" class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <table class="min-w-full divide-y divide-gray-300">
@@ -60,7 +60,7 @@
           </tbody>
         </table>
       </div>
-      
+
       <!-- Card View (for user) -->
       <div v-else class="space-y-4">
         <div v-for="post in posts" :key="post.id" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">

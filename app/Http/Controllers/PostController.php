@@ -9,6 +9,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class PostController extends Controller
@@ -23,11 +24,12 @@ class PostController extends Controller
                 return $this->responseWithForbidden('You do not have permission to view posts');
             }
 
-            $posts = Post::with('author')->visibleTo(auth()->user())
-                ->orderBy('created_at', 'desc')
+            $posts = Post::query()->visibleTo(auth()->user())->with('author')
                 ->when($request->input('search'), function ($query, $search) {
-                    return $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('content', 'like', "%{$search}%");
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', '%' . $search . '%')
+                            ->orWhere('content', 'like', '%' . $search . '%');
+                    });
                 })->paginate($request->input('per_page', 10));
 
             return (new PostCollection($posts))
@@ -36,6 +38,12 @@ class PostController extends Controller
                     'message' => 'Posts retrieved successfully'
                 ]);
         } catch (Exception $e) {
+            Log::error('Failed to retrieve posts', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'request_params' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->responseWithError('Failed to retrieve posts: ' . $e->getMessage(), 500);
         }
     }
@@ -61,6 +69,12 @@ class PostController extends Controller
                 'post' => new PostResource($post)
             ], 'Post created successfully', 201);
         } catch (Exception $e) {
+            Log::error('Failed to create post', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'request_data' => $request->validated(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->responseWithError('Failed to create post: ' . $e->getMessage(), 500);
         }
     }
@@ -81,6 +95,12 @@ class PostController extends Controller
                 'post' => new PostResource($post)
             ], 'Post retrieved successfully');
         } catch (Exception $e) {
+            Log::error('Failed to retrieve post', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'post_id' => $post->id ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->responseWithError('Failed to retrieve post: ' . $e->getMessage(), 500);
         }
     }
@@ -105,6 +125,13 @@ class PostController extends Controller
                 'post' => new PostResource($post)
             ], 'Post updated successfully');
         } catch (Exception $e) {
+            Log::error('Failed to update post', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'post_id' => $post->id ?? null,
+                'request_data' => $request->validated(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->responseWithError('Failed to update post: ' . $e->getMessage(), 500);
         }
     }
@@ -123,6 +150,12 @@ class PostController extends Controller
 
             return $this->responseWithSuccess(null, 'Post deleted successfully');
         } catch (Exception $e) {
+            Log::error('Failed to delete post', [
+                'error' => $e->getMessage(),
+                'user_id' => auth()->id(),
+                'post_id' => $post->id ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->responseWithError('Failed to delete post: ' . $e->getMessage(), 500);
         }
     }

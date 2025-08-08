@@ -23,6 +23,7 @@
                 @create="openCreateModal"
                 @edit="openEditModal"
                 @delete="deletePost"
+                @search="handleSearch"
             />
 
             <!-- Error Message -->
@@ -80,8 +81,8 @@ const closeModal = () => {
     postsStore.clearError();
 };
 const handleSearch =  (e)=>{
-    search.value= e.target.value;
-    postsStore.fetchPosts({search:search.value})
+    search.value = e.target.value;
+    postsStore.fetchPosts(search.value);
 }
 const handlePostSaved = async (postData) => {
     try {
