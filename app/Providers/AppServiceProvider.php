@@ -8,6 +8,8 @@ use App\Models\Admin;
 use App\Models\Post;
 use App\Policies\AdminPolicy;
 use App\Policies\PostPolicy;
+use Illuminate\Support\Facades\Schema;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Schema::defaultStringLength(191);
         Gate::policy(Admin::class, AdminPolicy::class);
         Gate::policy(Post::class, PostPolicy::class);
     }
