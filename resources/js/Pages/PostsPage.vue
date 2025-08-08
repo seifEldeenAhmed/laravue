@@ -5,49 +5,27 @@
             <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-gray-900">All Posts</h2>
                 <input
-                    class="appearance-none rounded-none relative block w-100 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    type="text"
-                    v-model="search"
-                    name="search"
-                    id="search"
-                    placeholder="search"
-                    @change="handleSearch"
-                />
+                    class="appearance-none rounded-none relative block w-100 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                    type="text" v-model="search" name="search" id="search" placeholder="search"
+                    @change="handleSearch" />
             </div>
 
             <!-- Posts List -->
-            <PostsList
-                :posts="postsStore.posts"
-                :loading="postsStore.loading"
-                :user-role="authStore.isAdmin ? 'admin' : 'user'"
-                @create="openCreateModal"
-                @edit="openEditModal"
-                @delete="deletePost"
-                @search="handleSearch"
-            />
+            <PostsList :posts="postsStore.posts" :loading="postsStore.loading"
+                :user-role="authStore.isAdmin ? 'admin' : 'user'" @create="openCreateModal" @edit="openEditModal"
+                @delete="deletePost" @search="handleSearch" />
 
             <!-- Error Message -->
-            <div
-                v-if="postsStore.error"
-                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-            >
+            <div v-if="postsStore.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 {{ postsStore.error }}
-                <button
-                    @click="postsStore.clearError()"
-                    class="float-right text-red-500 hover:text-red-700"
-                >
+                <button @click="postsStore.clearError()" class="float-right text-red-500 hover:text-red-700">
                     ×
                 </button>
             </div>
 
             <!-- Create/Edit Modal -->
-            <PostModal
-                v-if="showModal"
-                :show="showModal"
-                :post="selectedPost"
-                @close="closeModal"
-                @submit="handlePostSaved"
-            />
+            <PostModal v-if="showModal" :show="showModal" :post="selectedPost" @close="closeModal"
+                @submit="handlePostSaved" />
         </div>
     </DashboardLayout>
 </template>
@@ -80,7 +58,7 @@ const closeModal = () => {
     selectedPost.value = null;
     postsStore.clearError();
 };
-const handleSearch =  (e)=>{
+const handleSearch = (e) => {
     search.value = e.target.value;
     postsStore.fetchPosts(search.value);
 }

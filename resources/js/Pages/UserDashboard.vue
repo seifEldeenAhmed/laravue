@@ -2,44 +2,17 @@
   <DashboardLayout title="Admin Dashboard">
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <StatsCard
-        title="Total Posts"
-        :value="postsStore.totalPosts"
-        icon="users"
-        color="indigo"
-      />
-      <StatsCard
-        title="Published Posts"
-        :value="postsStore.publishedPosts.length"
-        icon="check"
-        color="green"
-      />
-      <StatsCard
-        title="Draft Posts"
-        :value="postsStore.draftPosts.length"
-        icon="clock"
-        color="yellow"
-      />
+      <StatsCard title="Total Posts" :value="postsStore.totalPosts" icon="users" color="orange" />
+      <StatsCard title="Published Posts" :value="postsStore.publishedPosts.length" icon="check" color="green" />
+      <StatsCard title="Draft Posts" :value="postsStore.draftPosts.length" icon="clock" color="yellow" />
     </div>
 
     <!-- Posts Management -->
-    <PostsList
-      title="All Posts"
-      :posts="postsStore.posts"
-      :loading="postsStore.loading"
-      view-mode="table"
-      @create="showCreateModal = true"
-      @edit="editPost"
-      @delete="deletePost"
-    />
+    <PostsList title="All Posts" :posts="postsStore.posts" :loading="postsStore.loading" view-mode="table"
+      @create="showCreateModal = true" @edit="editPost" @delete="deletePost" />
 
     <!-- Create/Edit Post Modal -->
-    <PostModal
-      :show="showCreateModal"
-      :post="editingPost"
-      @close="closeModal"
-      @submit="handlePostSubmit"
-    />
+    <PostModal :show="showCreateModal" :post="editingPost" @close="closeModal" @submit="handlePostSubmit" />
   </DashboardLayout>
 </template>
 
@@ -65,7 +38,7 @@ const editPost = (post) => {
 
 const deletePost = async (post) => {
   if (!confirm('Are you sure you want to delete this post?')) return
-  
+
   try {
     await postsStore.deletePost(post.id)
   } catch (error) {
