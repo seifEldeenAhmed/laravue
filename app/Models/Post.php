@@ -32,7 +32,7 @@ class Post extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'status' => 'string',
+        'status' => \App\Enums\PostStatus::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

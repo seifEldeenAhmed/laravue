@@ -22,9 +22,9 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'=> ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'status' => [ 'string', 'in:published,draft'],
+            'status' => ['required', 'string', 'in:' . implode(',', array_column(\App\Enums\PostStatus::cases(), 'value'))],
         ];
     }
 }

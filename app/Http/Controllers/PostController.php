@@ -90,9 +90,8 @@ class PostController extends Controller
                 return $this->responseWithForbidden('You do not have permission to update this post');
             }
 
-            $data = $request->all();
-            $data['author_id'] = auth()->id();
-            $data['author_type'] = auth()->user()::class;
+            $data = $request->validated();
+            // Don't allow updating author information - security vulnerability
             $post->update($data);
 
             $post->load('author');

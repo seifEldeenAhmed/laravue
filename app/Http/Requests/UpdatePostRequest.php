@@ -24,7 +24,7 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string'],
-            'status' => ['sometimes', 'string', 'in:published,draft'],
+            'status' => ['sometimes', 'string', 'in:' . implode(',', array_column(\App\Enums\PostStatus::cases(), 'value'))],
         ];
     }
 }
