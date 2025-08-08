@@ -70,8 +70,7 @@ const closeModal = () => {
 
 onMounted(() => {
   // Only fetch if we don't have posts already
-  if (postsStore.posts.length === 0) {
-    postsStore.fetchPosts()
-  }
+  postsStore.fetchPosts()
+
 })
 </script>

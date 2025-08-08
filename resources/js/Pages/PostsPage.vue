@@ -122,6 +122,6 @@ const closeConfirm = () => {
 
 onMounted(() => {
     // Only fetch if we don't have posts or if we want to refresh
-    postsStore.fetchPosts();
+    postsStore.fetchMyPosts();
 });
 </script>

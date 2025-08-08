@@ -26,7 +26,7 @@ export const usePostsStore = defineStore('posts', () => {
     loading.value = true
     error.value = null
 
-      console.log(search)
+    console.log(search)
     try {
       const authStore = useAuthStore()
       const response = await axios.get('/api/posts', {
@@ -36,6 +36,29 @@ export const usePostsStore = defineStore('posts', () => {
         params: {
           search: search || ''
         }
+      })
+      posts.value = response.data.data
+      console.log(posts.value);
+
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Failed to fetch posts'
+      console.error('Error fetching posts:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+  const fetchMyPosts = async (search) => {
+    if (loading.value) return // Prevent duplicate requests
+    loading.value = true
+    error.value = null
+
+    try {
+      const authStore = useAuthStore()
+      const response = await axios.get('/api/posts/my-posts', {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        },
+        
       })
       posts.value = response.data.data
       console.log(posts.value);
@@ -149,6 +172,7 @@ export const usePostsStore = defineStore('posts', () => {
 
     // Actions
     fetchPosts,
+    fetchMyPosts,
     createPost,
     updatePost,
     deletePost,

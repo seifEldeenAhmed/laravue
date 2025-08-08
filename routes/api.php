@@ -41,6 +41,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
 //Dashboard route for admin
 Route::get('/admin/dashboard', \App\Http\Controllers\AdminDashboardController::class);
 Route::group(['prefix' => 'posts', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/my-posts',[\App\Http\Controllers\PostController::class, 'myPosts']);
     Route::get('/', [\App\Http\Controllers\PostController::class, 'index']);
     Route::post('/', [\App\Http\Controllers\PostController::class, 'store']);
     Route::get('/{post}', [\App\Http\Controllers\PostController::class, 'show']);
