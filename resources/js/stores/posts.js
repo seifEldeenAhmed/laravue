@@ -21,9 +21,9 @@ export const usePostsStore = defineStore('posts', () => {
   const totalPosts = computed(() => posts.value.length)
 
   // Actions
-  const fetchPosts = async () => {
+  const fetchPosts = async (paginateObj) => {
     if (loading.value) return // Prevent duplicate requests
-    
+    const {pageNumber, perPage, search}= paginateObj;
     loading.value = true
     error.value = null
     
@@ -32,6 +32,11 @@ export const usePostsStore = defineStore('posts', () => {
       const response = await axios.get('/api/posts', {
         headers: {
           Authorization: `Bearer ${authStore.token}`
+        },
+        params:{
+            page:pageNumber,
+            perPage:perPage,
+            search:search
         }
       })
       posts.value = response.data.data

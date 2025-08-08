@@ -16,7 +16,7 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             if (!Gate::allows('viewAny', Post::class)) {
@@ -24,7 +24,11 @@ class PostController extends Controller
             }
 
             $posts = Post::with('author')->visibleTo(auth()->user())
-            ->orderBy('created_at','desc')->paginate(10);
+                ->orderBy('created_at', 'desc')
+                ->when($request->input('search'), function ($query, $search) {
+                    return $query->where('title', 'like', "%{$search}%")
+                        ->orWhere('content', 'like', "%{$search}%");
+                })->paginate($request->input('per_page', 10));
 
             return (new PostCollection($posts))
                 ->additional([
