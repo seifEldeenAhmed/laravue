@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import StatusBadge from './StatusBadge.vue'
+import StatusBadge from '../ui/StatusBadge.vue'
 
 defineProps({
   posts: {

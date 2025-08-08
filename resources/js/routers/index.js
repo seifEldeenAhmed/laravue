@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginPage from "../Pages/LoginPage.vue";
 import AdminDashboard from "../Pages/AdminDashboard.vue";
 import UserDashboard from "../Pages/UserDashboard.vue";
+import PostsPage from "../Pages/PostsPage.vue";
 import { useAuthStore } from "../stores/auth";
 
 const validRoles = ['admins', 'users'];
@@ -21,6 +22,12 @@ const routes = [
         component: UserDashboard,
         meta: { requiresAuth: true, requiresUser: true }
     },
+    {
+        path:"/posts",
+        name: "posts",
+        component: PostsPage,
+        meta: { requiresAuth: true }
+    }
 ];
 
 const router = createRouter({

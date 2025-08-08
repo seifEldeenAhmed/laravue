@@ -2,7 +2,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import LoginForm from '../components/LoginForm.vue'
+import LoginForm from '../components/forms/LoginForm.vue'
 
 const route = useRoute()
 const role = computed(() => route.params.role) // "admins" or "users"

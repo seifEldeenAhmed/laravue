@@ -4,8 +4,24 @@
     <nav class="bg-white shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-          <div class="flex items-center">
+          <div class="flex items-center space-x-8">
             <h1 class="text-xl font-semibold text-gray-900">{{ title }}</h1>
+            <div class="flex space-x-6">
+              <router-link
+                :to="authStore.isAdmin ? '/admins' : '/users'"
+                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                :class="{ 'text-blue-600 font-semibold': route.path === (authStore.isAdmin ? '/admins' : '/users') }"
+              >
+                Dashboard
+              </router-link>
+              <router-link
+                to="/posts"
+                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                :class="{ 'text-blue-600 font-semibold': route.path === '/posts' }"
+              >
+                Posts
+              </router-link>
+            </div>
           </div>
           <div class="flex items-center space-x-4">
             <span class="text-sm text-gray-700">Welcome, {{ authStore.user?.name }}</span>
@@ -30,7 +46,7 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 defineProps({
@@ -41,6 +57,7 @@ defineProps({
 })
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const handleLogout = async () => {

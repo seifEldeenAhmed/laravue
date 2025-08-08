@@ -23,7 +23,8 @@ class PostController extends Controller
                 return $this->responseWithForbidden('You do not have permission to view posts');
             }
 
-            $posts = Post::with('author')->visibleTo(auth()->user())->paginate(1);
+            $posts = Post::with('author')->visibleTo(auth()->user())
+            ->orderBy('created_at','desc')->paginate(10);
 
             return (new PostCollection($posts))
                 ->additional([
