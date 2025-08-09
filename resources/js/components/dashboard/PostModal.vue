@@ -1,7 +1,7 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-    @click="$emit('close')">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" @click.stop>
+  <div v-if="show" class="fixed inset-0 bg-opacity-25 overflow-y-auto h-full w-full z-50"
+    @click="$emit('close')" style="background-color: rgba(0, 0, 0, 0.25);">
+    <div class="relative top-20 mx-auto p-5 border w-[500px] max-w-[90vw] shadow-lg rounded-md bg-white" @click.stop>
       <div class="mt-3">
         <h3 class="text-lg font-medium text-gray-900 text-center">{{ title }}</h3>
         <form @submit.prevent="handleSubmit" class="mt-4 space-y-4">
@@ -16,7 +16,7 @@
             <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
             <textarea id="content" v-model="form.content" required rows="4"
               class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-              placeholder="Enter post content"></textarea>
+              placeholder="Enter post content" ></textarea>
           </div>
 
           <div>
@@ -26,6 +26,11 @@
               <option value="draft">Draft</option>
               <option value="published">Published</option>
             </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Post Image</label>
+            <ImageUpload ref="imageUploadRef" :img-src="form.image" />
           </div>
 
           <div v-if="error" class="text-red-600 text-sm">
@@ -59,6 +64,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import ImageUpload from '../ui/ImageUpload.vue'
 
 const props = defineProps({
   show: {
@@ -76,11 +82,13 @@ const emit = defineEmits(['close', 'submit'])
 const form = ref({
   title: '',
   content: '',
-  status: 'draft'
+  status: 'draft',
+  image: null
 })
 
 const loading = ref(false)
 const error = ref('')
+const imageUploadRef = ref(null)
 
 const isEdit = computed(() => !!props.post)
 const title = computed(() => isEdit.value ? 'Edit Post' : 'Create New Post')
@@ -91,13 +99,19 @@ watch(() => props.post, (newPost) => {
     form.value = {
       title: newPost.title || '',
       content: newPost.content || '',
-      status: newPost.status || 'draft'
+      status: newPost.status || 'draft',
+      image: newPost.image || null
     }
   } else {
     form.value = {
       title: '',
       content: '',
-      status: 'draft'
+      status: 'draft',
+      image: null
+    }
+    // Clear image upload when creating new post
+    if (imageUploadRef.value) {
+      imageUploadRef.value.clear()
     }
   }
   error.value = ''
@@ -108,6 +122,10 @@ watch(() => props.show, (isShowing) => {
   if (!isShowing) {
     error.value = ''
     loading.value = false
+    // Clear image upload when modal is closed
+    if (imageUploadRef.value) {
+      imageUploadRef.value.clear()
+    }
   }
 })
 
@@ -116,7 +134,25 @@ const handleSubmit = async () => {
   error.value = ''
 
   try {
-    await emit('submit', { ...form.value, id: props.post?.id })
+    // Create FormData to handle file upload
+    let formData = new FormData()
+    formData.append('title', form.value.title)
+    formData.append('content', form.value.content)
+    formData.append('status', form.value.status)
+
+    // Add image if one is selected
+    const imageFile = imageUploadRef.value?.getFile()
+    console.log('Selected image file:', imageFile);
+
+    if (imageFile) {
+      formData.append('image', imageFile)
+    }
+
+    // Add ID for updates
+    if (props.post?.id) {
+      formData.append('id', props.post.id)
+    }
+    emit('submit', formData)
     emit('close')
   } catch (err) {
     error.value = err.message || 'An error occurred'
@@ -124,4 +160,9 @@ const handleSubmit = async () => {
     loading.value = false
   }
 }
+const updateFormImage = (imagePath) => {
+  form.value.image = imagePath
+}
+
+
 </script>

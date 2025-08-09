@@ -14,13 +14,13 @@ Route::group(['prefix' => 'auth'], function () {
 
     // User authentication routes
     Route::group(['prefix' => 'user'], function () {
-        Route::post('/login', [UserAuthController::class, 'login']);
+        Route::post('/login', [UserAuthController::class, 'login'])->middleware('throttle:3,1');
         Route::post('/register', [UserAuthController::class, 'register']);
         Route::post('/logout', [UserAuthController::class, 'logout'])->middleware('auth:sanctum');
     });
     // Admin authentication routes
     Route::group(['prefix' => 'admin'], function () {
-        Route::post('/login', [AdminAuthController::class, 'login']);
+        Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:3,1');
         Route::post('/register', [AdminAuthController::class, 'register']);
         Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth:sanctum');
     });
@@ -41,10 +41,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () 
 //Dashboard route for admin
 Route::get('/admin/dashboard', \App\Http\Controllers\AdminDashboardController::class);
 Route::group(['prefix' => 'posts', 'middleware' => ['auth:sanctum']], function () {
-    Route::get('/my-posts',[\App\Http\Controllers\PostController::class, 'myPosts']);
     Route::get('/', [\App\Http\Controllers\PostController::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\PostController::class, 'store']);
+    Route::post('/', [\App\Http\Controllers\PostController::class, 'store'])->middleware('throttle:6,1');
     Route::get('/{post}', [\App\Http\Controllers\PostController::class, 'show']);
-    Route::put('/{post}', [\App\Http\Controllers\PostController::class, 'update']);
+    Route::patch('/{post}', [\App\Http\Controllers\PostController::class, 'update']);
     Route::delete('/{post}', [\App\Http\Controllers\PostController::class, 'destroy']);
 });

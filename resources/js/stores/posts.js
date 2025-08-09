@@ -8,6 +8,19 @@ export const usePostsStore = defineStore('posts', () => {
   const posts = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const pagination = ref({
+    current_page: 1,
+    last_page: 1,
+    per_page: 10,
+    total: 0,
+    from: 0,
+    to: 0
+  })
+  const meta = ref({
+    count: 0,
+    drafted: 0,
+    published: 0
+  })
 
   // Getters
   const publishedPosts = computed(() =>
@@ -18,15 +31,13 @@ export const usePostsStore = defineStore('posts', () => {
     posts.value.filter(post => post.status === 'draft')
   )
 
-  const totalPosts = computed(() => posts.value.length)
+  const totalPosts = computed(() => pagination.value.total)
 
   // Actions
-  const fetchPosts = async (search) => {
+  const fetchPosts = async (search, page = 1, perPage = 10) => {
     if (loading.value) return // Prevent duplicate requests
     loading.value = true
     error.value = null
-
-    console.log(search)
     try {
       const authStore = useAuthStore()
       const response = await axios.get('/api/posts', {
@@ -34,35 +45,32 @@ export const usePostsStore = defineStore('posts', () => {
           Authorization: `Bearer ${authStore.token}`
         },
         params: {
-          search: search || ''
+          search: search || '',
+          page: page,
+          per_page: perPage
         }
       })
+
+      // Handle paginated response
       posts.value = response.data.data
-      console.log(posts.value);
 
-    } catch (err) {
-      error.value = err.response?.data?.message || 'Failed to fetch posts'
-      console.error('Error fetching posts:', err)
-    } finally {
-      loading.value = false
-    }
-  }
-  const fetchMyPosts = async (search) => {
-    if (loading.value) return // Prevent duplicate requests
-    loading.value = true
-    error.value = null
+      // Update pagination data
+      if (response.data.meta) {
+        pagination.value = {
+          current_page: response.data.meta.current_page[0],
+          last_page: response.data.meta.last_page[0],
+          per_page: response.data.meta.per_page[0],
+          total: response.data.meta.total[0] || response.data.meta.count,
+          from: response.data.meta.from[0] || ((response.data.meta.current_page[0] - 1) * response.data.meta.per_page[0] + 1),
+          to: response.data.meta.to[0] || Math.min(response.data.meta.current_page[0] * response.data.meta.per_page[0], response.data.meta.total[0] || response.data.meta.count)
+        }
 
-    try {
-      const authStore = useAuthStore()
-      const response = await axios.get('/api/posts/my-posts', {
-        headers: {
-          Authorization: `Bearer ${authStore.token}`
-        },
-        
-      })
-      posts.value = response.data.data
-      console.log(posts.value);
-
+        meta.value = {
+          count: response.data.meta.count || posts.value.length,
+          drafted: response.data.meta.drafted || 0,
+          published: response.data.meta.published || 0
+        }
+      }
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch posts'
       console.error('Error fetching posts:', err)
@@ -78,10 +86,13 @@ export const usePostsStore = defineStore('posts', () => {
     try {
       const authStore = useAuthStore()
 
+      const isFormData = postData instanceof FormData
+
       const response = await axios.post('/api/posts', postData, {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
-          'Content-Type': 'application/json'
+          // Only set Content-Type for JSON, let browser set it for FormData
+          ...(isFormData ? {} : { 'Content-Type': 'application/json' })
         }
       })
 
@@ -102,10 +113,23 @@ export const usePostsStore = defineStore('posts', () => {
 
     try {
       const authStore = useAuthStore()
-      const response = await axios.put(`/api/posts/${postId}`, postData, {
+
+      // Determine if we're sending FormData or regular JSON
+      const isFormData = postData instanceof FormData
+
+      // For updates with FormData, we need to use POST with _method field
+      const method = isFormData ? 'post' : 'patch'
+      const url = isFormData ? `/api/posts/${postId}?_method=Patch` : `/api/posts/${postId}`
+
+      if (isFormData) {
+        postData.append('_method', 'PATCH')
+      }
+
+      const response = await axios[method](url, postData, {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
-          'Content-Type': 'application/json'
+          // Only set Content-Type for JSON, let browser set it for FormData
+          ...(isFormData ? {} : { 'Content-Type': 'application/json' })
         }
       })
 
@@ -164,6 +188,8 @@ export const usePostsStore = defineStore('posts', () => {
     posts,
     loading,
     error,
+    pagination,
+    meta,
 
     // Getters
     publishedPosts,
@@ -172,7 +198,6 @@ export const usePostsStore = defineStore('posts', () => {
 
     // Actions
     fetchPosts,
-    fetchMyPosts,
     createPost,
     updatePost,
     deletePost,

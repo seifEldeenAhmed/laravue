@@ -25,6 +25,9 @@ class PostCollection extends ResourceCollection
                 'current_page' => $this->currentPage(),
                 'last_page' => $this->lastPage(),
                 'per_page' => $this->perPage(),
+                'total' => $this->total(),
+                'from' => $this->firstItem(),
+                'to' => $this->lastItem(),
                 'count' => $this->collection->count(),
                 'drafted' => $this->collection->where('status', 'draft')->count(),
                 'published' => $this->collection->where('status', 'published')->count()

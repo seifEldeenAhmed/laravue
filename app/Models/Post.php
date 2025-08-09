@@ -24,6 +24,7 @@ class Post extends Model
         'author_id',
         'author_type',
         'status',
+        'image'
     ];
 
     /**

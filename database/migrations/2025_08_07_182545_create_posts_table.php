@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->index(); // Add index for better search performance
+            $table->string('title',255)->index(); // Add index for better search performance
             $table->text('content');
             $table->morphs('author'); // This will create author_id and author_type columns
             $table->enum('status', array_column(\App\Enums\PostStatus::cases(), 'value'))
@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->timestamps();
 
             // Add composite index for common queries
+            $table->fullText(['content','title']);
             $table->index(['author_id', 'author_type', 'status']);
         });
     }

@@ -9,7 +9,7 @@
 
     <!-- Posts Management -->
     <PostsList title="All Posts" :posts="postsStore.posts" :loading="postsStore.loading" view-mode="table"
-      @create="showCreateModal = true" @edit="editPost" @delete="deletePost" />
+      @create="showCreateModal = true" @edit="editPost" @delete="deletePost" :show-actions="false" :show-create-button="false"/>
 
     <!-- Create/Edit Post Modal -->
     <PostModal :show="showCreateModal" :post="editingPost" @close="closeModal" @submit="handlePostSubmit" />
@@ -69,8 +69,6 @@ const closeModal = () => {
 }
 
 onMounted(() => {
-  // Only fetch if we don't have posts already
   postsStore.fetchPosts()
-
 })
 </script>

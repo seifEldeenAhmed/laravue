@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PostStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePostRequest extends FormRequest
 {
@@ -24,7 +26,8 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'string'],
-            'status' => ['sometimes', 'string', 'in:' . implode(',', array_column(\App\Enums\PostStatus::cases(), 'value'))],
+            'status' => ['sometimes', Rule::enum(PostStatus::class)],
+            'image' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif', 'max:10240']
         ];
     }
 }

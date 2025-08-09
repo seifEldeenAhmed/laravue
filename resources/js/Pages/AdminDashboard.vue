@@ -7,6 +7,8 @@
       <StatsCard title="Draft Posts" :value="draftPosts" icon="clock" color="yellow" />
     </div>
 
+    <!-- top users -->
+    <TopUsers :users="topUsers" />
 
   </DashboardLayout>
 </template>
@@ -16,6 +18,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useDashboardStore } from "../stores/dashboard.js";
 import DashboardLayout from '../layouts/DashboardLayout.vue'
 import StatsCard from '../components/dashboard/StatsCard.vue'
+import TopUsers from '../components/dashboard/TopUsers.vue'
 
 const dashboardStore = useDashboardStore()
 

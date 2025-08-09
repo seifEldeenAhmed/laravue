@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -24,13 +25,16 @@ class PostController extends Controller
                 return $this->responseWithForbidden('You do not have permission to view posts');
             }
 
-            $posts = Post::query()->with('author')
+            $posts = Post::query()->with('author')->visibleTo(auth()->user())
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('title', 'like', '%' . $search . '%')
                             ->orWhere('content', 'like', '%' . $search . '%');
                     });
-                })->paginate($request->input('per_page', 10));
+                })
+                ->latest()
+                ->paginate($request->input('per_page', 10))
+                ->withQueryString();
 
             return (new PostCollection($posts))
                 ->additional([
@@ -57,11 +61,13 @@ class PostController extends Controller
             if (!Gate::allows('create', Post::class)) {
                 return $this->responseWithForbidden('You do not have permission to create posts');
             }
-
             $data = $request->validated();
             $data['author_id'] = auth()->id();
             $data['author_type'] = auth()->user()::class;
 
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('posts', 'public');
+            }
             $post = Post::create($data);
             $post->load('author');
 
@@ -88,11 +94,11 @@ class PostController extends Controller
             if (!Gate::allows('view', $post)) {
                 return $this->responseWithForbidden('You do not have permission to view this post');
             }
-
-            $post->load('author');
-
+            $response = Cache::remember("posts.{$post->id}",now()->addHour(),function()use($post){
+                return new PostResource($post->load('author'));
+            });
             return $this->responseWithSuccess([
-                'post' => new PostResource($post)
+                'post' => $response
             ], 'Post retrieved successfully');
         } catch (Exception $e) {
             Log::error('Failed to retrieve post', [
@@ -116,13 +122,19 @@ class PostController extends Controller
             }
 
             $data = $request->validated();
-            // Don't allow updating author information - security vulnerability
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('posts', 'public');
+            }
             $post->update($data);
 
-            $post->load('author');
+            // Clear the existing cache entry and set the new one
+            Cache::forget("posts.{$post->id}");
+            $response = Cache::remember("posts.{$post->id}", now()->addHour(), function() use($post){
+                return new PostResource($post->load('author'));
+            });
 
             return $this->responseWithSuccess([
-                'post' => new PostResource($post)
+                'post' => $response
             ], 'Post updated successfully');
         } catch (Exception $e) {
             Log::error('Failed to update post', [
@@ -147,6 +159,9 @@ class PostController extends Controller
             }
 
             $post->delete();
+            
+            // Clear the cache entry for the deleted post
+            Cache::forget("posts.{$post->id}");
 
             return $this->responseWithSuccess(null, 'Post deleted successfully');
         } catch (Exception $e) {
@@ -157,36 +172,6 @@ class PostController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return $this->responseWithError('Failed to delete post: ' . $e->getMessage(), 500);
-        }
-    }
-    public function myPosts(Request $request)
-    {
-        try {
-            if (!Gate::allows('viewAny', Post::class)) {
-                return $this->responseWithForbidden('You do not have permission to view posts');
-            }
-
-            $posts = Post::query()->visibleTo(auth()->user())->with('author')
-                ->when($request->input('search'), function ($query, $search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where('title', 'like', '%' . $search . '%')
-                            ->orWhere('content', 'like', '%' . $search . '%');
-                    });
-                })->paginate($request->input('per_page', 10));
-
-            return (new PostCollection($posts))
-                ->additional([
-                    'success' => true,
-                    'message' => 'Posts retrieved successfully'
-                ]);
-        } catch (Exception $e) {
-            Log::error('Failed to retrieve posts', [
-                'error' => $e->getMessage(),
-                'user_id' => auth()->id(),
-                'request_params' => $request->all(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return $this->responseWithError('Failed to retrieve posts: ' . $e->getMessage(), 500);
         }
     }
 }

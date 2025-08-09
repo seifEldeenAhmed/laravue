@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PostStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePostRequest extends FormRequest
 {
@@ -24,7 +26,8 @@ class StorePostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'status' => ['required', 'string', 'in:' . implode(',', array_column(\App\Enums\PostStatus::cases(), 'value'))],
+            'status' => ['required',Rule::enum(PostStatus::class)],
+            'image' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif', 'max:10240']
         ];
     }
 }
