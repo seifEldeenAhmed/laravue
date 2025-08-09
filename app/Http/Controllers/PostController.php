@@ -21,7 +21,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         try {
-            if (!Gate::allows('viewAny', Post::class)) {
+            if (!Gate::allows('viewAny', [Post::class])) {
                 return $this->responseWithForbidden('You do not have permission to view posts');
             }
 
@@ -58,7 +58,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         try {
-            if (!Gate::allows('create', Post::class)) {
+            if (!Gate::allows('create', [Post::class])) {
                 return $this->responseWithForbidden('You do not have permission to create posts');
             }
             $data = $request->validated();
@@ -91,7 +91,7 @@ class PostController extends Controller
     public function show(Post $post)
     {
         try {
-            if (!Gate::allows('view', $post)) {
+            if (!Gate::allows('view', [$post])) {
                 return $this->responseWithForbidden('You do not have permission to view this post');
             }
             $response = Cache::remember("posts.{$post->id}",now()->addHour(),function()use($post){
@@ -117,7 +117,7 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         try {
-            if (!Gate::allows('update', $post)) {
+            if (!Gate::allows('update', [$post])) {
                 return $this->responseWithForbidden('You do not have permission to update this post');
             }
 
@@ -154,7 +154,7 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         try {
-            if (!Gate::allows('delete', $post)) {
+            if (!Gate::allows('delete', [$post])) {
                 return $this->responseWithForbidden('You do not have permission to delete this post');
             }
 
