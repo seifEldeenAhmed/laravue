@@ -119,6 +119,20 @@ npm run dev
 
 Access the application at `http://localhost:8000`
 
+### Default User Accounts
+
+After running the database seeders, you can log in using these default accounts:
+
+**Regular User:**
+
+-   Email: `test@example.com`
+-   Password: `password`
+
+**Administrator:**
+
+-   Email: `admin@example.com`
+-   Password: `adminpassword`
+
 #### Production Mode
 
 Build the production assets:
@@ -415,7 +429,6 @@ php artisan config:clear
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
 
 ---
 
