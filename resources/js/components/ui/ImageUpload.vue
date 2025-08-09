@@ -34,7 +34,6 @@ import { ref, watch } from 'vue'
 const imgSrc = ref('')
 const uploaded = ref(false)
 const fileInput = ref(null)
-const currentFile = ref(null)
 
 const props = defineProps({
     imgSrc: {
@@ -104,7 +103,6 @@ const removeImage = () => {
 defineExpose({
     getFile: () => fileInput.value?.files[0],
     clear: removeImage,
-
 })
 </script>
 

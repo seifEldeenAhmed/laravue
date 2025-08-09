@@ -122,9 +122,8 @@ class PostController extends Controller
             }
 
             $data = $request->validated();
-            if ($request->hasFile('image')) {
-                $data['image'] = $request->file('image')->store('posts', 'public');
-            }
+            $data['image'] = $request->hasFile('image') ? $request->file('image')->store('posts', 'public') : null;
+
             $post->update($data);
 
             // Clear the existing cache entry and set the new one

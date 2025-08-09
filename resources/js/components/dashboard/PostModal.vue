@@ -144,7 +144,7 @@ const handleSubmit = async () => {
     const imageFile = imageUploadRef.value?.getFile()
     console.log('Selected image file:', imageFile);
 
-    if (imageFile) {
+    if (imageFile ) {
       formData.append('image', imageFile)
     }
 
@@ -159,9 +159,6 @@ const handleSubmit = async () => {
   } finally {
     loading.value = false
   }
-}
-const updateFormImage = (imagePath) => {
-  form.value.image = imagePath
 }
 
 
