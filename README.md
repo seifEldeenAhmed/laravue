@@ -87,7 +87,15 @@ php artisan migrate
 php artisan db:seed
 ```
 
-#### 7. Build Frontend Assets
+#### 7. Create Storage Link
+
+Create a symbolic link from the public storage directory to the storage directory:
+
+```bash
+php artisan storage:link
+```
+
+#### 8. Build Frontend Assets
 
 For development:
 
