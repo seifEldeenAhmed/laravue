@@ -29,8 +29,9 @@ Route::group(['prefix' => 'auth'], function () {
 
 
 //API routes for admin management
-
-Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () {
+// we can use auth:admin guard 
+// or use the HandleRole middleware
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/admins', [\App\Http\Controllers\AdminController::class, 'index']);
     Route::post('/admins', [\App\Http\Controllers\AdminController::class, 'store']);
     Route::get('/admins/{admin}', [\App\Http\Controllers\AdminController::class, 'show']);
