@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AdminLoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UserLoginRequest;
 use App\Http\Resources\UserResource;
-use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Exception;
@@ -31,7 +30,7 @@ class UserAuthController extends Controller
         }
     }
 
-    public function login(AdminLoginRequest $request)
+    public function login(UserLoginRequest $request)
     {
         try {
             $credentials = $request->only('email', 'password');
