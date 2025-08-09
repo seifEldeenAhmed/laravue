@@ -85,7 +85,6 @@ const getImageUrl = (imagePath) => {
 }
 
 watch(() => props.imgSrc, (newSrc) => {
-    console.log('Received imgSrc prop:', newSrc);
     if (newSrc) {
         imgSrc.value = getImageUrl(newSrc);
     }

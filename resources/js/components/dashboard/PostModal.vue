@@ -142,7 +142,6 @@ const handleSubmit = async () => {
 
     // Add image if one is selected
     const imageFile = imageUploadRef.value?.getFile()
-    console.log('Selected image file:', imageFile);
 
     if (imageFile ) {
       formData.append('image', imageFile)
