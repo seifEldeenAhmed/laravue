@@ -20,7 +20,9 @@ return new class extends Migration {
             $table->timestamps();
 
             // Add composite index for common queries
-            $table->fullText(['content','title']);
+            if (config('database.default') !== 'sqlite') {
+                $table->fullText(['content','title']);
+            }
             $table->index(['author_id', 'author_type', 'status']);
         });
     }
